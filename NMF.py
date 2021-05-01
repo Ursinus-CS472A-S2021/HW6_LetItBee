@@ -10,7 +10,7 @@ import time
 import librosa
 
 
-def create_musaic(S, WComplex, win_length, hop_length, L, r=7, p=10, c=3):
+def create_musaic(S, WComplex, win_length, hop_length, L, r=3, p=10, c=3):
     """
     Implement the technique from "Let It Bee-Towards NMF-Inspired
     Audio Mosaicing"
@@ -28,7 +28,7 @@ def create_musaic(S, WComplex, win_length, hop_length, L, r=7, p=10, c=3):
     L: int
         Number of iterations
     r: int
-        Width of the repeated activation filter
+        Half of the width of the repeated activation filter
     p: int
         Degree of polyphony; i.e. number of values in each column of H which should be 
         un-shrunken
