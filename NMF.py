@@ -10,16 +10,16 @@ import time
 import librosa
 
 
-def create_musaic(V, W, win_length, hop_length, L, r=7, p=10, c=3):
+def create_musaic(S, WComplex, win_length, hop_length, L, r=7, p=10, c=3):
     """
     Implement the technique from "Let It Bee-Towards NMF-Inspired
     Audio Mosaicing"
 
     Parameters
     ----------
-    V: ndarray(M, N)
+    S: ndarray(M, N, dtype=np.complex)
         A M x N nonnegative target matrix
-    W: ndarray(M, K) 
+    WComplex: ndarray(M, K, dtype=np.complex) 
         An M x K matrix of template sounds in some time order along the second axis
     win_length: int
         Window length of STFT (used in Griffin Lim)
@@ -35,11 +35,11 @@ def create_musaic(V, W, win_length, hop_length, L, r=7, p=10, c=3):
     c: int
         Half length of time-continuous activation filter
     """
-    VAbs = np.abs(V)
+    V = np.abs(S) # V is the absolute magnitude spectrogram, keeping it nonnegative
+    W = np.abs(WComplex) # W is the absolute magnitude spectrogram of WComplex
     N = V.shape[1]
     K = W.shape[1]
-    WAbs = np.abs(W)
-    WDenom = np.sum(WAbs, 0)
+    WDenom = np.sum(W, 0)
     WDenom[WDenom == 0] = 1
 
     # Random nonnegative initialization of H
@@ -61,11 +61,11 @@ def create_musaic(V, W, win_length, hop_length, L, r=7, p=10, c=3):
         
         # Step 4: Match target with an iteration of KL-based NMF, keeping
         # W fixed
-        WH = WAbs.dot(H)
+        WH = W.dot(H)
         WH[WH == 0] = 1
-        VLam = VAbs/WH
-        H = H*((WAbs.T).dot(VLam)/WDenom[:, None])
+        VLam = V/WH
+        H = H*((W.T).dot(VLam)/WDenom[:, None])
     
-    y = librosa.istft(W.dot(H), win_length=win_length, hop_length=hop_length)
+    y = librosa.istft(WComplex.dot(H), win_length=win_length, hop_length=hop_length)
     ## TODO: Use 10 iterations of Griffin-Lim instead of a straight-up STFT
     return y
