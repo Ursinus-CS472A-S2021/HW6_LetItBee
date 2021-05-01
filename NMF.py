@@ -62,7 +62,7 @@ def create_musaic(S, WComplex, win_length, hop_length, L, r=3, p=10, c=3):
         # Step 4: Match target with an iteration of KL-based NMF, keeping
         # W fixed
         WH = W.dot(H)
-        WH[WH == 0] = 1
+        WH[WH == 0] = 1 # Prevent divide by 0
         VLam = V/WH
         H = H*((W.T).dot(VLam)/WDenom[:, None])
     
